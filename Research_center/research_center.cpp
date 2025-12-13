@@ -21,10 +21,9 @@ bool isValid(int x, int y) {
     return (x >= 0 && x < n && y >= 0 && y < n);
 }
 
-
+// একটা position থেকে একটা rare-element এর distance
 int bfs(int startX, int startY, int targetX, int targetY) {
-    if (startX == targetX && startY == targetY)
-        return 0;
+   
     
     memset(visited, 0, sizeof(visited));
     queue<Node> q;
@@ -34,15 +33,14 @@ int bfs(int startX, int startY, int targetX, int targetY) {
     while (!q.empty()) {
         Node current = q.front();
         q.pop();
+         if (current.x == targetX && current.y == targetY)
+                return current.time;
         
         for (int i = 0; i < 4; i++) {
             int nextX = current.x + step[i][0];
             int nextY = current.y + step[i][1];
             
             if (isValid(nextX, nextY) && grid[nextX][nextY] == 1 && visited[nextX][nextY] == 0) {
-                if (nextX == targetX && nextY == targetY) {
-                    return current.time + 1;
-                }
                 visited[nextX][nextY] = 1;
                 q.push({nextX, nextY, current.time + 1});
             }
@@ -93,7 +91,6 @@ int main() {
                 }
             }
         }
-        
         cout << answer << "\n";
     }
     
