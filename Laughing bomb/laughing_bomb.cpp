@@ -27,12 +27,7 @@ int bfs(int startX, int startY) {
     if (grid[startX][startY] == 0) {
         return 0;
     }
-    
     queue<Node> q;
-    // Node start;
-    // start.x = startX;
-    // start.y = startY;
-    // start.time = 1;
     q.push({startX, startY, 1});
     visited[startX][startY] = 1;
     
