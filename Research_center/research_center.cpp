@@ -2,10 +2,11 @@
 #include <queue>
 #include <cstring>
 #include <climits>
+#include <algorithm>
 using namespace std;
 
 int grid[25][25];
-int visited[25][25];
+int dist[5][25][25];  // dist[r][i][j] = rare element r থেকে (i,j) এর distance
 int n, k;
 int rareElements[5][2];
 
@@ -21,32 +22,36 @@ bool isValid(int x, int y) {
     return (x >= 0 && x < n && y >= 0 && y < n);
 }
 
-// একটা position থেকে একটা rare-element এর distance
-int bfs(int startX, int startY, int targetX, int targetY) {
-   
+// একটা rare element থেকে সব cells এ distance calculate
+void bfs(int rareIdx, int startX, int startY) {
+    // Initialize distances
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < n; j++) {
+            dist[rareIdx][i][j] = INT_MAX;
+        }
+    }
     
-    memset(visited, 0, sizeof(visited));
     queue<Node> q;
     q.push({startX, startY, 0});
-    visited[startX][startY] = 1;
+    dist[rareIdx][startX][startY] = 0;
     
     while (!q.empty()) {
         Node current = q.front();
         q.pop();
-         if (current.x == targetX && current.y == targetY)
-                return current.time;
         
         for (int i = 0; i < 4; i++) {
             int nextX = current.x + step[i][0];
             int nextY = current.y + step[i][1];
             
-            if (isValid(nextX, nextY) && grid[nextX][nextY] == 1 && visited[nextX][nextY] == 0) {
-                visited[nextX][nextY] = 1;
+            if (isValid(nextX, nextY) && 
+                grid[nextX][nextY] == 1 && 
+                dist[rareIdx][nextX][nextY] == INT_MAX) {
+                
+                dist[rareIdx][nextX][nextY] = current.time + 1;
                 q.push({nextX, nextY, current.time + 1});
             }
         }
     }
-    return INT_MAX; // পৌঁছানো যায়নি
 }
 
 int main() {
@@ -73,25 +78,33 @@ int main() {
             }
         }
         
+        // প্রতিটা rare element থেকে একবার BFS
+        for (int r = 0; r < k; r++) {
+            bfs(r, rareElements[r][0], rareElements[r][1]);
+        }
+        
         int answer = INT_MAX;
         
-        // প্রতিটা road position check করো
+        // প্রতিটা road position check
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 if (grid[i][j] == 1) {
                     int maxDist = 0;
                     
-                    // এই position থেকে সব rare-elements এর distance
+                    // এই cell থেকে সব rare elements এর distance
                     for (int r = 0; r < k; r++) {
-                        int dist = bfs(i, j, rareElements[r][0], rareElements[r][1]);
-                        maxDist = max(maxDist, dist);
+                        maxDist = max(maxDist, dist[r][i][j]);
                     }
                     
-                    answer = min(answer, maxDist);
+                    // যদি সব rare elements reachable হয়
+                    if (maxDist < INT_MAX) {
+                        answer = min(answer, maxDist);
+                    }
                 }
             }
         }
-        cout << answer << "\n";
+        
+        cout << (answer == INT_MAX ? -1 : answer) << "\n";
     }
     
     return 0;
