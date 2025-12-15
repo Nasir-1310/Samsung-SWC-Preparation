@@ -9,7 +9,8 @@ double calE(long long n, long long a, long long b, long long c) {
 }
 
 long long findN(long long a, long long b, long long c, long long k) {
-    if(k == 0) return 0;
+    if(k == 0) 
+        return 0;
     
     long long low = 1;
     long long high;
